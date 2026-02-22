@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { IUser } from '../models/User';
 
+const JWT_SECRET = process.env.JWT_SECRET || 'zedflip-fallback-secret-key-2025';
+const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
+
 interface TokenPayload {
   id: string;
   email: string;
@@ -14,19 +17,19 @@ export const generateToken = (user: IUser): string => {
     isAdmin: user.isAdmin,
   };
 
-  return jwt.sign(payload, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  return jwt.sign(payload, JWT_SECRET, {
+    expiresIn: JWT_EXPIRE,
   });
 };
 
 export const verifyToken = (token: string): TokenPayload => {
-  return jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+  return jwt.verify(token, JWT_SECRET) as TokenPayload;
 };
 
 export const generateRefreshToken = (user: IUser): string => {
   return jwt.sign(
     { id: user._id.toString() },
-    process.env.JWT_SECRET!,
+    JWT_SECRET,
     { expiresIn: '30d' }
   );
 };
